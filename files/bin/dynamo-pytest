@@ -6,7 +6,7 @@ set -euo pipefail
 IMAGE="${DYNAMO_SGLANG_IMAGE:-nvcr.io/nvidia/ai-dynamo/sglang-runtime:1.5.1}"
 mkdir -p ~/hf
 exec podman run --rm --device nvidia.com/gpu=all --ipc=host --network host \
-  -v ~/dynamo:/workspace -v ~/hf:/root/.cache/huggingface -e HF_TOKEN \
+  -v ~/dynamo:/workspace -v ~/hf:/hf -e HF_HOME=/hf -e HF_TOKEN \
   -w /workspace "$IMAGE" bash -lc '
     # Pytest plugins pinned by the repo, plus the light runtime deps tests import.
     grep -E "^pytest" container/deps/requirements.test.txt | sed "s/ *#.*//" > /tmp/req.txt

@@ -13,7 +13,7 @@ echo "[$(date -u +%T)] image ready"
 
 for m in $MODELS; do
   echo "[$(date -u +%T)] downloading $m"
-  podman run --rm --entrypoint python3 -v ~/hf:/root/.cache/huggingface -e HF_TOKEN "$IMAGE" \
+  podman run --rm --entrypoint python3 -v ~/hf:/hf -e HF_HOME=/hf -e HF_TOKEN "$IMAGE" \
     -c "import sys; from huggingface_hub import snapshot_download; snapshot_download(sys.argv[1])" "$m" \
     >/dev/null || echo "download failed: $m"
 done
