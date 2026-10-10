@@ -10,5 +10,5 @@ exec podman run --rm --device nvidia.com/gpu=all --ipc=host --network host \
   -w /workspace "$IMAGE" bash -lc '
     # Pytest plugins pinned by the repo, plus the light runtime deps tests import.
     grep -E "^pytest" container/deps/requirements.test.txt | sed "s/ *#.*//" > /tmp/req.txt
-    pip install -q -r /tmp/req.txt nats-py==2.12.0 jsonschema psutil requests filelock 2>&1 | tail -1
+    pip install -q --break-system-packages -r /tmp/req.txt nats-py==2.12.0 jsonschema psutil requests filelock 2>&1 | tail -1
     python3 -m pytest -p no:cacheprovider "$@"' _ "$@"
