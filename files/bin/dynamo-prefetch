@@ -1,0 +1,20 @@
+#!/bin/bash
+# Pull the Dynamo SGLang runtime image and predownload test models into ~/hf.
+# Override with DYNAMO_SGLANG_IMAGE / PREFETCH_MODELS (space-separated) in ~/.radix_env.
+set -uo pipefail
+[[ -f ~/.radix_env ]] && { set -a; source ~/.radix_env; set +a; }
+IMAGE="${DYNAMO_SGLANG_IMAGE:-nvcr.io/nvidia/ai-dynamo/sglang-runtime:1.5.1}"
+MODELS="${PREFETCH_MODELS:-Qwen/Qwen3-0.6B Qwen/Qwen3-8B Tengyunw/qwen3_8b_eagle3}"
+mkdir -p ~/hf
+
+echo "[$(date -u +%T)] pulling $IMAGE"
+podman image exists "$IMAGE" || podman pull -q "$IMAGE" || { echo "pull failed"; exit 1; }
+echo "[$(date -u +%T)] image ready"
+
+for m in $MODELS; do
+  echo "[$(date -u +%T)] downloading $m"
+  podman run --rm --entrypoint python3 -v ~/hf:/root/.cache/huggingface -e HF_TOKEN "$IMAGE" \
+    -c "import sys; from huggingface_hub import snapshot_download; snapshot_download(sys.argv[1])" "$m" \
+    >/dev/null || echo "download failed: $m"
+done
+echo "[$(date -u +%T)] prefetch done"
