@@ -5,7 +5,7 @@ set -euo pipefail
 [[ -f ~/.radix_env ]] && { set -a; source ~/.radix_env; set +a; }
 IMAGE="${DYNAMO_SGLANG_IMAGE:-nvcr.io/nvidia/ai-dynamo/sglang-runtime:1.5.1}"
 mkdir -p ~/hf
-exec podman run --rm --device nvidia.com/gpu=all --ipc=host --shm-size=16g --network host \
+exec podman run --rm --device nvidia.com/gpu=all --ipc=host --network host \
   -v ~/dynamo:/workspace -v ~/hf:/root/.cache/huggingface -e HF_TOKEN \
   -w /workspace "$IMAGE" bash -lc '
     pip install -q pytest==9.0.3 pytest-timeout==2.4.0 pytest-rerunfailures==16.1 \
